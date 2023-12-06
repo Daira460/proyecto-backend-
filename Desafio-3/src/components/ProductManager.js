@@ -2,7 +2,7 @@ import { promises as fs } from "fs";
 
 class ProductManager {
   constructor() {
-    this.path = "./productos.txt";
+    this.path = "./productos.json";
     this.products = [];
   }
 
@@ -64,5 +64,7 @@ productos.addProduct("Titulo10", "Descripcion10", 3000, "Imagen10", "abc130", 2)
 
 const allProducts = await productos.readProducts();
 console.log(allProducts);
+
+export default ProductManager;
 
 
