@@ -1,70 +1,122 @@
-import { promises as fs } from "fs";
+import crypto from "crypto";
+import utils from "../utils.js";
 
 class ProductManager {
-  constructor() {
-    this.path = "./productos.json";
+  constructor(path) {
+    this.path = path;
     this.products = [];
   }
 
-  static id = 0;
+  async addProduct(title, description, price, thumbnail, code, stock) {
+    if (!title || !description || !price || !thumbnail || !code || !stock) {
+      throw new Error("Todos los campos son obligatorios");
+    }
 
-  addProduct = async (title, description, price, thumbnail, code, stock) => {
-    ProductManager.id++;
-    let newProduct = {
-      title,
-      description,
-      price,
-      thumbnail,
-      code,
-      stock,
-      id: ProductManager.id,
-    };
-    this.products.push(newProduct);
+    try {
+      const data = await utils.readFile(this.path);
+      this.products = data?.length > 0 ? data : [];
+    } catch (error) {
+      console.error("Error adding product:", error.message);
+      throw error;
+    }
 
-    await fs.writeFile(this.path, JSON.stringify(this.products));
-  };
+    const codeExists = this.products.some((dato) => dato.code === code);
 
-  readProducts = async () => {
-    let respuesta = await fs.readFile(this.path, "utf-8");
-    return JSON.parse(respuesta);
-  };
+    if (codeExists) {
+      throw new Error("El código ya existe. Por favor, verifique.");
+    } else {
+      const newProduct = {
+        id: crypto.randomUUID(),
+        title,
+        description,
+        price,
+        thumbnail,
+        code,
+        stock,
+      };
+      this.products.push(newProduct);
 
-  getProductsById = async (id) => {
-    let products = await this.readProducts();
-    return products.find((product) => product.id === id);
-  };
+      try {
+        await utils.writeFile(this.path, this.products);
+      } catch (error) {
+        console.error("Error writing file:", error.message);
+        throw error;
+      }
+    }
+  }
 
-  deleteProductById = async (id) => {
-    let products = await this.readProducts();
-    let productFilter = products.filter((product) => product.id !== id);
-    await fs.writeFile(this.path, JSON.stringify(productFilter));
-    console.log("Producto Eliminado");
-  };
+  async getProducts() {
+    try {
+      const data = await utils.readFile(this.path);
+      this.products = data;
+      return data?.length > 0 ? this.products : "No hay registros aún";
+    } catch (error) {
+      console.error("Error getting products:", error.message);
+      throw error;
+    }
+  }
 
-  updateProduct = async ({ id, ...product }) => {
-    await this.deleteProductById(id);
-    let productsOld = await this.readProducts();
-    let productsModified = [{ ...product, id }, ...productsOld];
-    await fs.writeFile(this.path, JSON.stringify(productsModified));
-  };
+  async getProductById(id) {
+    try {
+      const data = await utils.readFile(this.path);
+      this.products = data?.length > 0 ? data : [];
+      const product = this.products.find((dato) => dato.id === id);
+
+      if (product) {
+        return product;
+      } else {
+        throw new Error("No existe el producto solicitado");
+      }
+    } catch (error) {
+      console.error("Error getting product by id:", error.message);
+      throw error;
+    }
+  }
+
+  async updateProductById(id, data) {
+    try {
+      let products = await utils.readFile(this.path);
+      this.products = products?.length > 0 ? products : [];
+
+      let productIndex = this.products.findIndex((dato) => dato.id === id);
+      if (productIndex !== -1) {
+        this.products[productIndex] = {
+          ...this.products[productIndex],
+          ...data,
+        };
+        await utils.writeFile(this.path, products);
+        return {
+          mensaje: "Producto actualizado",
+          producto: this.products[productIndex],
+        };
+      } else {
+        throw new Error("No existe el producto solicitado");
+      }
+    } catch (error) {
+      console.error("Error updating product by id:", error.message);
+      throw error;
+    }
+  }
+
+  async deleteProductById(id) {
+    try {
+      let products = await utils.readFile(this.path);
+      this.products = products?.length > 0 ? products : [];
+      let productIndex = this.products.findIndex((dato) => dato.id === id);
+      if (productIndex !== -1) {
+        let product = this.products[productIndex];
+        this.products.splice(productIndex, 1);
+        await utils.writeFile(this.path, products);
+        return { mensaje: "Producto eliminado", producto: product };
+      } else {
+        throw new Error("No existe el producto solicitado");
+      }
+    } catch (error) {
+      console.error("Error deleting product by id:", error.message);
+      throw error;
+    }
+  }
 }
 
-const productos = new ProductManager();
-
-/*productos.addProduct("Titulo1", "Descripcion1", 1000, "Imagen1", "abc121", 1);
-productos.addProduct("Titulo2", "Descripcion2", 2000, "Imagen2", "abc122", 2);
-productos.addProduct("Titulo3", "Descripcion3", 3000, "Imagen3", "abc123", 3);
-productos.addProduct("Titulo4", "Descripcion4", 3000, "Imagen4", "abc124", 4);
-productos.addProduct("Titulo5", "Descripcion5", 3000, "Imagen5", "abc125", 5);
-productos.addProduct("Titulo6", "Descripcion6", 3000, "Imagen6", "abc126", 4);
-productos.addProduct("Titulo7", "Descripcion7", 3000, "Imagen7", "abc127", 3);
-productos.addProduct("Titulo8", "Descripcion8", 3000, "Imagen8", "abc128", 2);
-productos.addProduct("Titulo9", "Descripcion9", 3000, "Imagen9", "abc129", 1);
-productos.addProduct("Titulo10", "Descripcion10", 3000, "Imagen10", "abc130", 2);*/
-
-const allProducts = await productos.readProducts();
-console.log(allProducts);
-
 export default ProductManager;
-
 

@@ -20,10 +20,11 @@ app.get('/products', async (req, res) => {
 
 app.get('/products/:pid', async (req, res) => {
     const pid = parseInt(req.params.pid);
-    const resultado = await productManager.getProductById(pid);
+    const resultado = await productManager.getProductsById(pid);
 
-    if (resultado.code === 200) {
-        res.status(200).send(resultado.products);
+
+    if (resultado) {
+        res.status(200).send(resultado);
     } else {
         res.status(404).send({ status: 404, message: 'Producto no encontrado' });
     }
@@ -54,5 +55,3 @@ app.delete('/products/:pid', async (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server on port ${PORT}`);
 });
-
-export default App;
