@@ -15,7 +15,8 @@ router.get("/", async (req, res) => {
       res.json({ data: response, limit: false, quantity: response.length });
     }
   } catch (err) {
-    console.log(err);
+    console.error(err);
+    res.status(500).json({ message: "error interno del servidor", data: err.message });
   }
 });
 
@@ -27,12 +28,13 @@ router.get("/:pid", async (req, res) => {
     if (product) {
       res.json({ message: "success", data: product });
     } else {
-      res.json({
+      res.status(404).json({
         message: "el producto solicitado no existe",
       });
     }
   } catch (err) {
-    console.log(err);
+    console.error(err);
+    res.status(500).json({ message: "error interno del servidor", data: err.message });
   }
 });
 
@@ -40,6 +42,11 @@ router.post("/", async (req, res) => {
   const { title, description, price, thumbnail, code, stock } = req.body;
 
   try {
+    if (!title || !price || !thumbnail || !code || !stock) {
+      res.status(400).json({ message: "faltan campos obligatorios" });
+      return;
+    }
+
     const result = await productManager.addProduct(
       title,
       description,
@@ -50,8 +57,8 @@ router.post("/", async (req, res) => {
     );
     res.json({ message: "success", data: result });
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: "error", data: err });
+    console.error(err);
+    res.status(500).json({ message: "error interno del servidor", data: err.message });
   }
 });
 
@@ -73,13 +80,13 @@ router.put("/:pid", async (req, res) => {
       const respuesta = await productManager.updateProductById(pid, newProduct);
       res.json({ message: "success", data: respuesta });
     } else {
-      res.json({
+      res.status(404).json({
         message: "el producto solicitado no existe",
       });
     }
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: "error", data: err });
+    console.error(err);
+    res.status(500).json({ message: "error interno del servidor", data: err.message });
   }
 });
 
@@ -92,13 +99,13 @@ router.delete("/:pid", async (req, res) => {
       const respuesta = await productManager.deleteProductById(pid);
       res.json({ message: "success", data: respuesta });
     } else {
-      res.json({
+      res.status(404).json({
         message: "el producto solicitado no existe",
       });
     }
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: "error", data: err });
+    console.error(err);
+    res.status(500).json({ message: "error interno del servidor", data: err.message });
   }
 });
 
