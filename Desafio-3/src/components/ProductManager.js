@@ -1,5 +1,6 @@
 import crypto from "crypto";
-import utils from "../utils.js";
+import { readFile, writeFile } from "../utils.js";
+
 
 class ProductManager {
   constructor(path) {
@@ -13,7 +14,7 @@ class ProductManager {
     }
 
     try {
-      const data = await utils.readFile(this.path);
+      const data = await readFile(this.path);
       this.products = data?.length > 0 ? data : [];
     } catch (error) {
       console.error("Error adding product:", error.message);
@@ -37,7 +38,7 @@ class ProductManager {
       this.products.push(newProduct);
 
       try {
-        await utils.writeFile(this.path, this.products);
+        await writeFile(this.path, this.products);
       } catch (error) {
         console.error("Error writing file:", error.message);
         throw error;
@@ -47,7 +48,7 @@ class ProductManager {
 
   async getProducts() {
     try {
-      const data = await utils.readFile(this.path);
+      const data = await readFile(this.path);
       this.products = data;
       return data?.length > 0 ? this.products : "No hay registros aún";
     } catch (error) {
@@ -58,9 +59,9 @@ class ProductManager {
 
   async getProductById(id) {
     try {
-      const data = await utils.readFile(this.path);
+      const data = await readFile(this.path);
       this.products = data?.length > 0 ? data : [];
-      const product = this.products.find((dato) => dato.id === id);
+      const product = this.products.find((dato) => dato.id == id);
 
       if (product) {
         return product;
@@ -75,16 +76,16 @@ class ProductManager {
 
   async updateProductById(id, data) {
     try {
-      let products = await utils.readFile(this.path);
+      let products = await readFile(this.path);
       this.products = products?.length > 0 ? products : [];
 
-      let productIndex = this.products.findIndex((dato) => dato.id === id);
+      let productIndex = this.products.findIndex((dato) => dato.id == id);
       if (productIndex !== -1) {
         this.products[productIndex] = {
           ...this.products[productIndex],
           ...data,
         };
-        await utils.writeFile(this.path, products);
+        await writeFile(this.path, products);
         return {
           mensaje: "Producto actualizado",
           producto: this.products[productIndex],
@@ -100,13 +101,13 @@ class ProductManager {
 
   async deleteProductById(id) {
     try {
-      let products = await utils.readFile(this.path);
+      let products = await readFile(this.path);
       this.products = products?.length > 0 ? products : [];
-      let productIndex = this.products.findIndex((dato) => dato.id === id);
+      let productIndex = this.products.findIndex((dato) => dato.id == id);
       if (productIndex !== -1) {
         let product = this.products[productIndex];
         this.products.splice(productIndex, 1);
-        await utils.writeFile(this.path, products);
+        await writeFile(this.path, products);
         return { mensaje: "Producto eliminado", producto: product };
       } else {
         throw new Error("No existe el producto solicitado");
@@ -119,4 +120,6 @@ class ProductManager {
 }
 
 export default ProductManager;
+
+
 

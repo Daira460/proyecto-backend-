@@ -1,26 +1,23 @@
-import fs from "fs";
+import fs from 'fs/promises';
 
-import { fileURLToPath } from "url";
-import { dirname } from "path";
-
-export const __filename = fileURLToPath(import.meta.url);
-export const __dirname = dirname(__filename);
-
-async function readFile(file) {
+async function readFile(path) {
   try {
-    const result = await fs.promises.readFile(__dirname + "/" + file, "utf-8");
-    return JSON.parse(result);
-  } catch (err) {
-    console.error("Error reading file:", err.message);
-    throw err;
+    const data = await fs.readFile(path, 'utf-8');
+    return JSON.parse(data);
+  } catch (error) {
+    console.error('Error reading file:', error.message);
+    throw error;
   }
 }
 
-async function writeFile(file, data) {
+async function writeFile(path, data) {
   try {
-    await fs.promises.writeFile(__dirname + "/" + file, JSON.stringify(data));
-  } catch (err) {
-    console.error("Error writing file:", err.message);
-    throw err;
+    await fs.writeFile(path, JSON.stringify(data, null, 2), 'utf-8');
+  } catch (error) {
+    console.error('Error writing file:', error.message);
+    throw error;
   }
 }
+
+export { readFile, writeFile };
+

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { ProductManager } from "../classes/ProductManager.js";
+import ProductManager from "../components/ProductManager.js";
 
 const router = Router();
 const productManager = new ProductManager("productos.json");
@@ -9,11 +9,7 @@ router.get("/", async (req, res) => {
   try {
     let response = await productManager.getProducts();
     if (limit) {
-      let tempArray = response.filter((dat, index) => index < limit);
-      /* let tempArray = response.map((dat, index) => {
-          return index < limit && dat;
-        });
-        */
+      let tempArray = response.filter((dat, index) => index < Number(limit));
       res.json({ data: tempArray, limit: limit, quantity: tempArray.length });
     } else {
       res.json({ data: response, limit: false, quantity: response.length });
@@ -105,5 +101,8 @@ router.delete("/:pid", async (req, res) => {
     res.status(500).json({ message: "error", data: err });
   }
 });
+
 export default router;
+
+
 
