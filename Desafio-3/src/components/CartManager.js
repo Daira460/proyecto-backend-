@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import utils from "../utils.js";
+import { readFile, writeFile } from "../utils.js";
 
 class CartManager {
   static carts;
@@ -11,7 +11,7 @@ class CartManager {
 
   async addCart() {
     try {
-      const data = await utils.readFile(this.path);
+      const data =  await readFile(this.path);
       this.carts = data?.length > 0 ? data : [];
       const id = crypto.randomUUID();
 
@@ -23,7 +23,7 @@ class CartManager {
 
       this.carts.push(newCart);
 
-      await utils.writeFile(this.path, this.carts);
+      await writeFile(this.path, this.carts);
       return newCart;
     } catch (error) {
       console.error("Error adding cart:", error.message);
@@ -33,7 +33,7 @@ class CartManager {
 
   async getCarts() {
     try {
-      const data = await utils.readFile(this.path);
+      const data = await readFile(this.path);
       this.carts = data;
       return data?.length > 0 ? this.carts : "No hay registros aún";
     } catch (error) {
@@ -44,7 +44,7 @@ class CartManager {
 
   async getCartById(id) {
     try {
-      const data = await utils.readFile(this.path);
+      const data = await readFile(this.path);
       this.carts = data?.length > 0 ? data : [];
       const cart = this.carts.find((dato) => dato.id === id);
 
@@ -70,7 +70,7 @@ class CartManager {
       } else {
         products.push({
           product: pid,
-          quantity: 1,
+          quantity: 3,
         });
       }
       
@@ -89,7 +89,7 @@ class CartManager {
       const cartToUpdateIndex = carts.findIndex((carro) => carro.id === id);
       carts.splice(cartToUpdateIndex, 1, cart);
       
-      await utils.writeFile(this.path, carts);
+      await readFile(this.path, carts);
       return true;
     } catch (error) {
       console.error("Error updating cart:", error.message);

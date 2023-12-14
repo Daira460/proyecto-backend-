@@ -1,6 +1,6 @@
 import express from "express";
-import ProductsRouter from "./routes/Productsrouter.js";
-import CartsRouter from "./routes/Cart.router.js";
+import {router as ProductsRouter} from "./routes/Productsrouter.js";
+import {router as CartsRouter} from "./routes/Cart.router.js";
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));

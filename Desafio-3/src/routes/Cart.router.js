@@ -2,7 +2,7 @@ import { Router } from "express";
 import CartManager from "../components/ProductManager.js";
 
 const router = Router();
-const cartManager = new CartManager("carts.json");
+const cartManager = new CartManager("./src/cart.json");
 
 router.get("/", async (req, res) => {
   try {
@@ -43,4 +43,4 @@ router.post("/:cid/products/:pid", async (req, res) => {
   }
 });
 
-export default router;
+export {router}

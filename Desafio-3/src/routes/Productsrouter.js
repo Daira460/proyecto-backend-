@@ -2,7 +2,7 @@ import { Router } from "express";
 import ProductManager from "../components/ProductManager.js";
 
 const router = Router();
-const productManager = new ProductManager("productos.json");
+const productManager = new ProductManager("./src/productos.json"); 
 
 router.get("/", async (req, res) => {
   const { limit } = req.query;
@@ -109,7 +109,7 @@ router.delete("/:pid", async (req, res) => {
   }
 });
 
-export default router;
+export {router}
 
 
 
