@@ -1,3 +1,4 @@
+// app.js
 import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
@@ -12,10 +13,7 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-
 const __filename = fileURLToPath(import.meta.url);
-
-
 const __dirname = dirname(__filename);
 
 app.use(express.static(__dirname + '/public'));
@@ -29,14 +27,32 @@ const productManager = new ProductManager('productos.json');
 app.use('/api/products', productsRouter);
 app.use('/api/carts', cartsRouter);
 
+app.get('/products', async (req, res) => {
+    try {
+        const productos = await productManager.getProducts();
+        res.render('products', { productos });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error obteniendo productos');
+    }
+});
+
+app.get('/realtime', async (req, res) => {
+    try {
+        const productos = await productManager.getProducts();
+        res.render('realtime', { productos });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error obteniendo productos para realtime');
+    }
+});
+
 const PORT = 4000;
 const server = http.createServer(app);
-
 
 const io = new Server(server);
 
 io.on('connection', (socket) => {
-
     socket.on('addProduct', async (product) => {
         console.log('Adding product:', product);
         try {
@@ -64,6 +80,8 @@ server.listen(PORT, () => {
 });
 
 export { server, io };
+
+
 
 
 
