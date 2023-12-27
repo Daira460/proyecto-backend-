@@ -29,26 +29,6 @@ app.use('/api/products', productsRouter);
 app.use('/api/carts', cartsRouter);
 app.use('/', viewsRouter); 
 
-app.get('/products', async (req, res) => {
-    try {
-        const productos = await productManager.getProducts();
-        res.render('productos', { productos });
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Error obteniendo productos');
-    }
-});
-
-app.get('/realtime', async (req, res) => {
-    try {
-        const productos = await productManager.getProducts();
-        res.render('realtime', { productos });
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Error obteniendo productos para realtime');
-    }
-});
-
 const PORT = 4000;
 const server = http.createServer(app);
 
