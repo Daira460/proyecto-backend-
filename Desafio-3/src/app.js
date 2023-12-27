@@ -8,6 +8,7 @@ import { router as productsRouter } from './routes/Productsrouter.js';
 import { router as cartsRouter } from './routes/Cart.router.js';
 import handlebars from 'express-handlebars';
 import ProductManager from './components/ProductManager.js';
+import { viewsRouter } from './routes/view.router.js';
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
@@ -22,15 +23,16 @@ app.engine('handlebars', handlebars.engine());
 app.set('views', __dirname + '/views');
 app.set('view engine', 'handlebars');
 
-const productManager = new ProductManager('productos.json');
+const productManager = new ProductManager('src/productos.json');
 
 app.use('/api/products', productsRouter);
 app.use('/api/carts', cartsRouter);
+app.use('/', viewsRouter); 
 
 app.get('/products', async (req, res) => {
     try {
         const productos = await productManager.getProducts();
-        res.render('products', { productos });
+        res.render('productos', { productos });
     } catch (error) {
         console.error(error);
         res.status(500).send('Error obteniendo productos');
